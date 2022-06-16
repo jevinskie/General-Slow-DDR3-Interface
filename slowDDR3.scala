@@ -62,16 +62,27 @@ case class DDR3Interface(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Bundle{
   val odt: Bool = out Bool()
   val rst_n: Bool = out Bool()
   val dm: UInt = out UInt(cfg.dqWidth/8 bits)
+
   val dq_i: UInt = cfg.useTristate generate in(UInt(cfg.dqWidth bits))
   val dq_o: UInt = cfg.useTristate generate out(UInt(cfg.dqWidth bits))
   val dq_oe: Bool = cfg.useTristate generate out(Bool())
   val dq: UInt = !cfg.useTristate generate inout(Analog(UInt(cfg.dqWidth bits)))
-  val dqs_p: UInt = inout(Analog(UInt(cfg.dqWidth/8 bits)))
-  val dqs_n: UInt = inout(Analog(UInt(cfg.dqWidth/8 bits)))
+  
+  val dqs_p_i: UInt = cfg.useTristate generate in(UInt(cfg.dqWidth/8 bits))
+  val dqs_p_o: UInt = cfg.useTristate generate out(UInt(cfg.dqWidth/8 bits))
+  val dqs_p_oe: Bool = cfg.useTristate generate out(Bool())
+  val dqs_p: UInt = !cfg.useTristate generate inout(Analog(UInt(cfg.dqWidth/8 bits)))
+
+  val dqs_n_i: UInt = cfg.useTristate generate in(UInt(cfg.dqWidth/8 bits))
+  val dqs_n_o: UInt = cfg.useTristate generate out(UInt(cfg.dqWidth/8 bits))
+  val dqs_n_oe: Bool = cfg.useTristate generate out(Bool())
+  val dqs_n: UInt = !cfg.useTristate generate inout(Analog(UInt(cfg.dqWidth/8 bits)))
 }
 
 case class DDR3TristateInterface(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Bundle{
   val dq: TriState[UInt] = TriState(UInt(cfg.dqWidth bits))
+  val dqs_p: TriState[UInt] = TriState(UInt(cfg.dqWidth/8 bits))
+  val dqs_n: TriState[UInt] = TriState(UInt(cfg.dqWidth/8 bits))
 }
 
 case class DDR3SystemIO(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Bundle with IMasterSlave{
@@ -109,10 +120,28 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
     triIO.dq.read := phyIO.dq_i
     phyIO.dq_o := triIO.dq.write
     phyIO.dq_oe := triIO.dq.writeEnable
+
+    triIO.dqs_p.read := phyIO.dqs_p_i
+    phyIO.dqs_p_o := triIO.dqs_p.write
+    phyIO.dqs_p_oe := triIO.dqs_p.writeEnable
+
+    triIO.dqs_n.read := phyIO.dqs_n_i
+    phyIO.dqs_n_o := triIO.dqs_n.write
+    phyIO.dqs_n_oe := triIO.dqs_n.writeEnable
   } else {
     triIO.dq.read := phyIO.dq
     when(triIO.dq.writeEnable) {
       phyIO.dq := triIO.dq.write
+    }
+
+    triIO.dqs_p.read := phyIO.dqs_p
+    when(triIO.dqs_p.writeEnable) {
+      phyIO.dqs_p := triIO.dqs_p.write
+    }
+
+    triIO.dqs_n.read := phyIO.dqs_n
+    when(triIO.dqs_n.writeEnable) {
+      phyIO.dqs_n := triIO.dqs_n.write
     }
   }
 
@@ -142,10 +171,10 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
 
   triIO.dq.writeEnable := dqOut
   triIO.dq.write := dqWire
-  when(dqOut){
-    phyIO.dqs_p := dqsPWire
-    phyIO.dqs_n := dqsNWire
-  }
+  triIO.dqs_p.writeEnable := dqOut
+  triIO.dqs_p.write := dqsPWire
+  triIO.dqs_n.writeEnable := dqOut
+  triIO.dqs_n.write := dqsNWire
 
   sysIO.dataRd.payload.setAsReg() init 0
   sysIO.dataRd.valid.setAsReg() init False
@@ -245,8 +274,8 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
     val dqInNArea = new Array[ClockingArea](cfg.dqWidth/8)
 
     for( i <- 0 until cfg.dqWidth/8 ){
-      dqInPDomain(i) = ClockDomain(phyIO.dqs_p(i))
-      dqInNDomain(i) = ClockDomain(phyIO.dqs_n(i))
+      dqInPDomain(i) = ClockDomain(triIO.dqs_p.read(i))
+      dqInNDomain(i) = ClockDomain(triIO.dqs_n.read(i))
 
       dqInPArea(i) = new ClockingArea(dqInPDomain(i)) {
         val dqReg = RegNext(triIO.dq.read(8 * i, 8 bits))
