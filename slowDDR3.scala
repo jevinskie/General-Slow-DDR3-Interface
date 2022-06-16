@@ -45,7 +45,8 @@ case class slowDDR3Cfg(
   // TBD.
   enableBursts: Boolean = false,
 
-  useTristate: Boolean = true
+  // use _i _o _oe suffixed tristate signals instead of inout, allowing use in wrappers
+  useTristate: Boolean = false,
 ){}
 
 case class DDR3Interface(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Bundle{
@@ -64,7 +65,7 @@ case class DDR3Interface(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Bundle{
   val dq_i: UInt = cfg.useTristate generate in(UInt(cfg.dqWidth bits))
   val dq_o: UInt = cfg.useTristate generate out(UInt(cfg.dqWidth bits))
   val dq_oe: Bool = cfg.useTristate generate out(Bool())
-  val dq: UInt = !cfg.useTristate generate inout(UInt(cfg.dqWidth bits))
+  val dq: UInt = !cfg.useTristate generate inout(Analog(UInt(cfg.dqWidth bits)))
   val dqs_p: UInt = inout(Analog(UInt(cfg.dqWidth/8 bits)))
   val dqs_n: UInt = inout(Analog(UInt(cfg.dqWidth/8 bits)))
 }
@@ -108,6 +109,11 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
     triIO.dq.read := phyIO.dq_i
     phyIO.dq_o := triIO.dq.write
     phyIO.dq_oe := triIO.dq.writeEnable
+  } else {
+    triIO.dq.read := phyIO.dq
+    when(triIO.dq.writeEnable) {
+      phyIO.dq := triIO.dq.write
+    }
   }
 
   val sysIO = slave(DDR3SystemIO(cfg))
