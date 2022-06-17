@@ -11,7 +11,5 @@ lazy val mylib = (project in file("."))
 
 resolvers += Resolver.sonatypeRepo("releases")
 libraryDependencies += "com.github.alexarchambault" %% "case-app" % "2.0.1"
-// cats-effect module
-libraryDependencies += "com.github.alexarchambault" %% "case-app-cats" % "2.0.1"
 
 fork := true

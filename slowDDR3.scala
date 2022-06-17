@@ -113,7 +113,6 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
   def calcCK(t:Int) = t * cfg.clkFreq / 1000000
 
   
-
   val inv_clk = in Bool()//input a inverted clock for the dqs
 
   val phyIO = DDR3Interface(cfg)
@@ -589,10 +588,8 @@ case class CLIOptions(
 )
 
 object DDR3Generate extends CaseApp[CLIOptions] {
-
   def run(options: CLIOptions, arg: RemainingArgs): Unit = {
     var cfg = slowDDR3Cfg(clkFreq = options.sys_clk / 2, useTristate = options.tristate)
     SDDR3GenCfg.generateVerilog(new slowDDR3(cfg))
   }
-
 }
