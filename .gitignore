@@ -1,5 +1,12 @@
 slowDDR3.v
+.bloop/
 .metals/
 .vscode/
+examples/analyzer.csv
+examples/csr.csv
+examples/build
+examples/dump.vcd
+examples/prog
+examples/stream.cfg
 project/
 target/
