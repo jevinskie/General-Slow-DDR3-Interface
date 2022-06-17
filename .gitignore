@@ -5,7 +5,7 @@ slowDDR3.v
 .vscode/
 examples/analyzer.csv
 examples/csr.csv
-examples/build
+examples/build/
 examples/dump.vcd
 examples/prog
 examples/stream.cfg
