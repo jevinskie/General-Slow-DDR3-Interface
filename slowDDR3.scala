@@ -9,8 +9,8 @@ import scala.language.postfixOps
 import caseapp._
 
 object Hz {
-val Hz = 1
-val MHz = 1000 * 1000 * Hz
+  val Hz = 1
+  val MHz = 1000 * 1000 * Hz
 }
 
 
@@ -43,7 +43,7 @@ case class slowDDR3Cfg(
 
   // DDR Clock Frequency, counted in Hz
   // It is half to the sys clk
-  clkFreq: Int = 50,
+  clkFreq: Int = 50 * Hz.MHz,
 
   // use multiple counters could increase the frequency, but the size would be larger
   // TBD.
@@ -116,7 +116,7 @@ case class DDR3SystemIO(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Bundle with IMast
 
 
 class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
-  def calcCK(t:Int) = t * cfg.clkFreq / 1000000
+  def calcCK(t:Int) = t * (cfg.clkFreq / Hz.MHz) / 1000000
 
   
   val inv_clk = in Bool()//input a inverted clock for the dqs
@@ -219,7 +219,7 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
 
   //internal counter
   val timer = new Area{
-    val counter = Reg(UInt(24 bits)) init(200*cfg.clkFreq) // wait for 200us after reset
+    val counter = Reg(UInt(24 bits)) init(200*(cfg.clkFreq / Hz.MHz)) // wait for 200us after reset
 
     when(clkGen.clk === False){counter := counter - 1}
 
@@ -488,7 +488,7 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
             when(timer.tick) {
               phyIO.rst_n := True
 
-              timer.counter := 500 * cfg.clkFreq // wait for 500us
+              timer.counter := 500 * (cfg.clkFreq / Hz.MHz) // wait for 500us
               initState := CKE
             }
           }
@@ -590,7 +590,7 @@ case class CLIOptions(
 object DDR3Generate extends CaseApp[CLIOptions] {
 
   def run(options: CLIOptions, arg: RemainingArgs): Unit = {
-    var cfg = slowDDR3Cfg(clkFreq = 50, useTristate = options.tristate)
+    var cfg = slowDDR3Cfg(clkFreq = options.sysClk / 2, useTristate = options.tristate)
     SpinalConfig(
       targetDirectory = options.odir,
       defaultConfigForClockDomains = ClockDomainConfig(
