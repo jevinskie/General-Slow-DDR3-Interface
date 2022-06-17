@@ -8,6 +8,12 @@ import scala.language.postfixOps
 
 import caseapp._
 
+object Hz {
+val Hz = 1
+val MHz = 1000 * 1000 * Hz
+}
+
+
 case class slowDDR3Cfg(
   // Timing config
   //t means time, counted in ps
@@ -35,7 +41,7 @@ case class slowDDR3Cfg(
   rowWidth: Int = 14,
   colWidth: Int = 10,
 
-  // DDR Clock Frequency, counted in MHz
+  // DDR Clock Frequency, counted in Hz
   // It is half to the sys clk
   clkFreq: Int = 50,
 
@@ -575,21 +581,22 @@ class slowDDR3(cfg:slowDDR3Cfg=slowDDR3Cfg()) extends Component {
 
 }
 
-object SDDR3GenCfg extends SpinalConfig(
-  defaultConfigForClockDomains = ClockDomainConfig(
-    resetKind = ASYNC,
-    resetActiveLevel = LOW
-  )
-)
-
 case class CLIOptions(
-  sys_clk: Int = 100000000,
+  odir: String = ".",
+  sysClk: Int = 100 * Hz.MHz,
   tristate: Boolean = false,
 )
 
 object DDR3Generate extends CaseApp[CLIOptions] {
+
   def run(options: CLIOptions, arg: RemainingArgs): Unit = {
-    var cfg = slowDDR3Cfg(clkFreq = options.sys_clk / 2, useTristate = options.tristate)
-    SDDR3GenCfg.generateVerilog(new slowDDR3(cfg))
+    var cfg = slowDDR3Cfg(clkFreq = 50, useTristate = options.tristate)
+    SpinalConfig(
+      targetDirectory = options.odir,
+      defaultConfigForClockDomains = ClockDomainConfig(
+        resetKind = ASYNC,
+        resetActiveLevel = LOW
+    )).generateVerilog(new slowDDR3(cfg))
   }
+
 }

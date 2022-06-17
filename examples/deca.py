@@ -22,7 +22,7 @@ from migen import *
 
 class BaseSoC(SoCCore):
     def __init__(
-        self, with_jtagbone=True, with_analyzer=True, sys_clk_freq=int(100e6), **kwargs
+        self, with_jtagbone=False, with_uartbone=True, with_analyzer=True, sys_clk_freq=int(100e6), **kwargs
     ):
         platform = terasic_deca.Platform()
 
@@ -39,18 +39,23 @@ class BaseSoC(SoCCore):
         self.submodules.crg = _CRG(platform, sys_clk_freq)
 
         # Slow DDR3 --------------------------------------------------------------------------------
-        ddr3_pads = platform.request("ddram")
+        # ddr3_pads = platform.request("ddram")
 
         # JTAGbone ---------------------------------------------------------------------------------
         if with_jtagbone:
             self.add_jtagbone()
+
+        # UARTbone ---------------------------------------------------------------------------------
+        if with_uartbone:
+            self.add_uartbone("gpio_serial", sys_clk_freq, baudrate=kwargs["uart_baudrate"])
 
         # scope ------------------------------------------------------------------------------------
         if with_analyzer:
             from litescope import LiteScopeAnalyzer
 
             analyzer_signals = [
-                ddr3_pads,
+                Signal(),
+                # ddr3_pads,
             ]
             self.submodules.analyzer = LiteScopeAnalyzer(
                 analyzer_signals,
@@ -80,7 +85,8 @@ def main():
     args = parser.parse_args()
 
     soc_kwargs = soc_core_argdict(args)
-    soc_kwargs["uart_name"] = "gpio_serial"
+    soc_kwargs["uart_name"] = "crossover"
+    soc_kwargs["uart_baudrate"] = 2_000_000
 
     soc = BaseSoC(
         with_analyzer=args.with_analyzer,

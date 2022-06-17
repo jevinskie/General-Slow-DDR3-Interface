@@ -1,3 +1,4 @@
+
 val spinalVersion = "1.7.0b"
 val spinalCore = "com.github.spinalhdl" %% "spinalhdl-core" % spinalVersion
 val spinalLib = "com.github.spinalhdl" %% "spinalhdl-lib" % spinalVersion
@@ -10,6 +11,6 @@ lazy val mylib = (project in file("."))
   )
 
 resolvers += Resolver.sonatypeRepo("releases")
-libraryDependencies += "com.github.alexarchambault" %% "case-app" % "2.0.1"
+libraryDependencies += "com.github.alexarchambault" %% "case-app" % "2.1.0-M13"
 
 fork := true
