@@ -6,6 +6,8 @@ import spinal.lib.io.TriState
 
 import scala.language.postfixOps
 
+import caseapp._
+
 case class slowDDR3Cfg(
   // Timing config
   //t means time, counted in ps
@@ -581,8 +583,16 @@ object SDDR3GenCfg extends SpinalConfig(
   )
 )
 
-object DDR3Generate {
-  def main(args: Array[String]): Unit = {
-    SDDR3GenCfg.generateVerilog(new slowDDR3(slowDDR3Cfg()))
+case class CLIOptions(
+  sys_clk: Int = 100000000,
+  tristate: Boolean = false,
+)
+
+object DDR3Generate extends CaseApp[CLIOptions] {
+
+  def run(options: CLIOptions, arg: RemainingArgs): Unit = {
+    var cfg = slowDDR3Cfg(clkFreq = options.sys_clk / 2, useTristate = options.tristate)
+    SDDR3GenCfg.generateVerilog(new slowDDR3(cfg))
   }
+
 }
