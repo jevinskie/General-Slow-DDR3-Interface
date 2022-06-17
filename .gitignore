@@ -1,4 +1,5 @@
 slowDDR3.v
+.bsp/
 .bloop/
 .metals/
 .vscode/
