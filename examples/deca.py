@@ -22,7 +22,7 @@ from migen import *
 
 class BaseSoC(SoCCore):
     def __init__(
-        self, with_jtagbone=True, with_analyzer=False, sys_clk_freq=int(100e6), **kwargs
+        self, with_jtagbone=True, with_analyzer=True, sys_clk_freq=int(100e6), **kwargs
     ):
         platform = terasic_deca.Platform()
 
@@ -38,6 +38,9 @@ class BaseSoC(SoCCore):
         # CRG --------------------------------------------------------------------------------------
         self.submodules.crg = _CRG(platform, sys_clk_freq)
 
+        # Slow DDR3 --------------------------------------------------------------------------------
+        ddr3_pads = platform.request("ddram")
+
         # JTAGbone ---------------------------------------------------------------------------------
         if with_jtagbone:
             self.add_jtagbone()
@@ -47,11 +50,11 @@ class BaseSoC(SoCCore):
             from litescope import LiteScopeAnalyzer
 
             analyzer_signals = [
-                Signal(),
+                ddr3_pads,
             ]
             self.submodules.analyzer = LiteScopeAnalyzer(
                 analyzer_signals,
-                depth=1024 * 4,
+                depth=1024,
                 clock_domain="sys",
                 rle_nbits_min=15,
                 csr_csv="analyzer.csv",
