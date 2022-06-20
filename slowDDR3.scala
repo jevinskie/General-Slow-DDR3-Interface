@@ -53,8 +53,20 @@ case class slowDDR3Cfg(
     enableBursts: Boolean = false,
 
     // use _i _o _oe suffixed tristate signals instead of inout, allowing use in wrappers
-    useTristate: Boolean = false
+    useTristate: Boolean = false,
+
+    // enable debug features
+    enableDebug: Boolean = false
 ) {}
+
+// state
+object InitState extends SpinalEnum {
+  val WAIT0, CKE, MRS2, MRS3, MRS1, MRS0, ZQCL, WAIT1 = newElement()
+}
+
+object WorkState extends SpinalEnum {
+  val IDLE, READ, WRITE, REFRESH = newElement()
+}
 
 case class DDR3Interface(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle {
   val address: UInt = out UInt (cfg.rowWidth bits)
@@ -84,6 +96,9 @@ case class DDR3Interface(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle {
   val dqs_n_o: UInt  = cfg.useTristate generate out(UInt(cfg.dqWidth / 8 bits))
   val dqs_n_oe: Bool = cfg.useTristate generate out(Bool())
   val dqs_n: UInt    = !cfg.useTristate generate inout(Analog(UInt(cfg.dqWidth / 8 bits)))
+
+  val init_state: InitState.C = cfg.enableDebug generate out(InitState)
+  val work_state: WorkState.C = cfg.enableDebug generate out(WorkState)
 }
 
 case class DDR3TristateInterface(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle {
@@ -186,22 +201,19 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
   sysIO.initFin.setAsReg() init False
 
   // state
-  object InitState extends SpinalEnum {
-    val WAIT0, CKE, MRS2, MRS3, MRS1, MRS0, ZQCL, WAIT1 = newElement()
-  }
   import InitState._
-
-  object WorkState extends SpinalEnum {
-    val IDLE, READ, WRITE, REFRESH = newElement()
-  }
-  import WorkState._
-
   val initState = RegInit(WAIT0)
   val initFin   = sysIO.initFin
 
+  import WorkState._
   val workState     = RegInit(IDLE)
   val refreshCount  = RegInit(U"0000")
   val refreshIssued = RegInit(False)
+
+  if (cfg.enableDebug) {
+    phyIO.init_state := initState
+    phyIO.work_state := workState
+  }
 
   // ddr clock generator
   val clkGen = new Area {
@@ -583,13 +595,18 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
 case class CLIOptions(
     odir: String = ".",
     sysClk: Int = (100 * Hz.MHz).toInt,
-    tristate: Boolean = false
+    tristate: Boolean = false,
+    debug: Boolean = false
 )
 
 object DDR3Generate extends CaseApp[CLIOptions] {
 
   def run(options: CLIOptions, arg: RemainingArgs): Unit = {
-    var cfg = slowDDR3Cfg(clkFreq = options.sysClk / 2, useTristate = options.tristate)
+    var cfg = slowDDR3Cfg(
+      clkFreq = options.sysClk / 2,
+      useTristate = options.tristate,
+      enableDebug = options.debug
+    )
     SpinalConfig(
       targetDirectory = options.odir,
       defaultConfigForClockDomains = ClockDomainConfig(
