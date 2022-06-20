@@ -1,0 +1,5 @@
+repos:
+- repo: git@github.com:coyainsurance/pre-commit-scalafmt.git
+  rev: 1.0.1
+  hooks:
+  - id: scalafmt

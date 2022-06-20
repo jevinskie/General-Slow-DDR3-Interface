@@ -60,11 +60,11 @@ case class slowDDR3Cfg(
 ) {}
 
 // state
-object InitState extends SpinalEnum {
+object InitState extends SpinalEnum(binarySequential) {
   val WAIT0, CKE, MRS2, MRS3, MRS1, MRS0, ZQCL, WAIT1 = newElement()
 }
 
-object WorkState extends SpinalEnum {
+object WorkState extends SpinalEnum(binarySequential) {
   val IDLE, READ, WRITE, REFRESH = newElement()
 }
 
@@ -97,8 +97,8 @@ case class DDR3Interface(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle {
   val dqs_n_oe: Bool = cfg.useTristate generate out(Bool())
   val dqs_n: UInt    = !cfg.useTristate generate inout(Analog(UInt(cfg.dqWidth / 8 bits)))
 
-  val init_state: InitState.C = cfg.enableDebug generate out(InitState)
-  val work_state: WorkState.C = cfg.enableDebug generate out(WorkState)
+  val init_state: InitState.C = cfg.enableDebug generate out(InitState())
+  val work_state: WorkState.C = cfg.enableDebug generate out(WorkState())
 }
 
 case class DDR3TristateInterface(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle {
