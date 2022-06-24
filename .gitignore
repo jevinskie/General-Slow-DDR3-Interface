@@ -9,6 +9,8 @@ target/
 # testing
 ddr3-sdram-verilog-model.zip
 model/
+# iverilog
+tb-iverilog
 # questa
 work/
 transcript

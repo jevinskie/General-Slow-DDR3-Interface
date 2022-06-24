@@ -1,11 +1,12 @@
 all: slowDDR3.v
 
-.PHONY: clean test-iverilog test-questa
+.PHONY: clean test-questa
 
 clean:
 	rm -rf slowDDR3.v \
 		ddr3-sdram-verilog-model.zip model \
-		work
+		tb-iverilog \
+		transcript work
 
 slowDDR3.v: slowDDR3.scala
 	sbt run
@@ -18,11 +19,20 @@ model: ddr3-sdram-verilog-model.zip
 	unzip -d model ddr3-sdram-verilog-model.zip
 	chmod -R +w model
 
-test-iverilog: slowDDR3.v tb.v model/ddr3.v
+model/ddr3.v: model
+
+tb-iverilog: slowDDR3.v tb.v model/ddr3.v
+	cd model && \
+		iverilog -g2005-sv -o ../tb-iverilog ../tb.v ../slowDDR3.v ddr3.v -Dden2048Mb -Dx16
+
+test-iverilog-run: tb-iverilog
+	./test-iverilog
 
 test-questa: slowDDR3.v tb.v model/ddr3.v
 	vlog slowDDR3.v
-	pushd model
-	vlog +define+x16 +define+den2048Mb ddr3.v
-	popd
+	cd model && \
+		vlog -work ../work -sv +define+x16 +define+den2048Mb ddr3.v
 	vlog tb.v
+
+test-questa-run: test-questa
+	vsim -c tb
