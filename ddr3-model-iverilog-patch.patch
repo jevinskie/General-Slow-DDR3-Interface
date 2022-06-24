@@ -1,0 +1,120 @@
+[1mpatdiff -git a/ddr3.v.orig b/ddr3.v
+[1mindex 0b1970c..98a8007 100644
+[1m
+[1m[0;31m------ [0m[0;1m a/ddr3.v.orig[0m
+[1m[0;32m++++++ [0m[0;1m b/ddr3.v[0m
+[0;100;30m@|[0m[0;1m-404,33 +404,33[0m ============================================================
+[0;100;30m |[0m    // Memory Storage
+[0;100;30m |[0m`ifdef MAX_MEM
+[0;100;30m |[0m    parameter RFF_BITS = DQ_BITS*BL_MAX;
+[0;100;30m |[0m     // %z format uses 8 bytes for every 32 bits or less.
+[0;100;30m |[0m    parameter RFF_CHUNK = 8 * (RFF_BITS/32 + (RFF_BITS%32 ? 1 : 0));
+[0;100;30m |[0m    reg [1024:1] tmp_model_dir;
+[0;100;30m |[0m    integer memfd[`BANKS-1:0];
+[0;100;30m |[0m
+[0;100;30m |[0m
+[0;100;30m |[0m    initial
+[0;100;30m |[0m    begin : file_io_open
+[0;100;30m |[0m        reg [BA_BITS - 1 : 0] bank;
+[0;100;30m |[0m        reg [ROW_BITS - 1 : 0] row;
+[0;100;30m |[0m        reg [COL_BITS - 1 : 0] col;
+[0;100;30m |[0m        reg [BA_BITS + ROW_BITS + COL_BITS - 1 : 0] addr;
+[0;100;30m |[0m        reg [BL_MAX * DQ_BITS - 1 : 0] data;
+[0;43;30m!|[0m[0;32m        //[0m string _char;
+[0;100;30m |[0m        integer in, fio_status;
+[0;100;30m |[0m
+[0;100;30m |[0m        if (!$value$plusargs("model_data+%s", tmp_model_dir))
+[0;100;30m |[0m        begin
+[0;100;30m |[0m            tmp_model_dir = "/tmp";
+[0;100;30m |[0m            $display(
+[0;100;30m |[0m                "%m: at time %t WARNING: no +model_data option specified, using /tmp.",
+[0;100;30m |[0m                $time
+[0;100;30m |[0m            );
+[0;100;30m |[0m        end
+[0;100;30m |[0m
+[0;100;30m |[0m        for (integer i = 0; i < `BANKS; i = i + 1)
+[0;100;30m |[0m            memfd[i] = open_bank_file(i);
+[0;100;30m |[0m
+[0;100;30m |[0m        // Preload section
+[0;100;30m |[0m    `ifdef mem_init
+[0;100;30m@|[0m[0;1m-526,35 +526,37[0m ============================================================
+[0;100;30m |[0m    reg                    dqs_out;
+[0;100;30m |[0m    reg     [DQS_BITS-1:0] dqs_out_dly;
+[0;100;30m |[0m    reg                    dq_out_en;
+[0;100;30m |[0m    reg     [DQ_BITS-1:0]  dq_out_en_dly;
+[0;100;30m |[0m    reg     [DQ_BITS-1:0]  dq_out;
+[0;100;30m |[0m    reg     [DQ_BITS-1:0]  dq_out_dly;
+[0;100;30m |[0m    integer                rdqsen_cntr;
+[0;100;30m |[0m    integer                rdqs_cntr;
+[0;100;30m |[0m    integer                rdqen_cntr;
+[0;100;30m |[0m    integer                rdq_cntr;
+[0;100;30m |[0m
+[0;100;30m |[0m    bufif1 buf_dqs    [DQS_BITS-1:0] (dqs,     dqs_out_dly,  dqs_out_en_dly & {DQS_BITS{out_en}});
+[0;100;30m |[0m    bufif1 buf_dqs_n  [DQS_BITS-1:0] (dqs_n,   ~dqs_out_dly, dqs_out_en_dly & {DQS_BITS{out_en}});
+[0;100;30m |[0m    bufif1 buf_dq     [DQ_BITS-1:0]  (dq,      dq_out_dly,   dq_out_en_dly  & {DQ_BITS {out_en}});
+[0;100;30m |[0m    assign tdqs_n = {DQS_BITS{1'bz}};
+[0;100;30m |[0m
+[0;41;30m-|[0m[0m[0;31m    assign[0m[0;2m TZQCS[0m[0;2m   = max( 64, ceil( 80000/tck_avg));[0m[0m
+[0;41;30m-|[0m[0m[0;31m    assign[0m[0;2m TZQINIT[0m[0;2m =  max(512, ceil(640000/tck_avg));[0m[0m
+[0;41;30m-|[0m[0m[0;31m    assign[0m[0;2m TZQOPER[0m[0;2m =  max(256, ceil(320000/tck_avg));[0m[0m
+[0;42;30m+|[0m[0m[0;32m    always @(*) begin[0m[0m
+[0;42;30m+|[0m[0m        TZQCS[0;32m   <[0m=  max( 64, ceil( 80000/tck_avg));[0m
+[0;42;30m+|[0m[0m        TZQINIT[0;32m <[0m=  max(512, ceil(640000/tck_avg));[0m
+[0;42;30m+|[0m[0m        TZQOPER[0;32m <[0m=  max(256, ceil(320000/tck_avg));[0m
+[0;42;30m+|[0m[0m[0;32m    end[0m[0m
+[0;100;30m |[0m
+[0;100;30m |[0m    initial begin
+[0;100;30m |[0m        if (BL_MAX < 2) 
+[0;100;30m |[0m            $display("%m ERROR: BL_MAX parameter must be >= 2.  \nBL_MAX = %d", BL_MAX);
+[0;100;30m |[0m        if ((1<<BO_BITS) > BL_MAX) 
+[0;100;30m |[0m            $display("%m ERROR: 2^BO_BITS cannot be greater than BL_MAX parameter.");
+[0;100;30m |[0m
+[0;100;30m |[0m        $timeformat (-12, 1, " ps", 1);
+[0;100;30m |[0m        seed = RANDOM_SEED;
+[0;100;30m |[0m
+[0;100;30m |[0m        ck_cntr = 0;
+[0;100;30m |[0m    end
+[0;100;30m |[0m
+[0;100;30m |[0m    function integer get_rtt_wr;
+[0;100;30m |[0m    input [1:0] rtt;
+[0;100;30m |[0m    begin
+[0;100;30m@|[0m[0;1m-601,37 +603,37[0m ============================================================
+[0;100;30m |[0m            ceil = number;
+[0;100;30m |[0m    endfunction
+[0;100;30m |[0m
+[0;100;30m |[0m    function integer floor;
+[0;100;30m |[0m        input number;
+[0;100;30m |[0m        real number;
+[0;100;30m |[0m
+[0;100;30m |[0m        // LMR 4.1.7
+[0;100;30m |[0m        // When either operand of a relational expression is a real operand then the other operand shall be converted
+[0;100;30m |[0m        // to an equivalent real value, and the expression shall be interpreted as a comparison between two real values.
+[0;100;30m |[0m        if (number < $rtoi(number))
+[0;100;30m |[0m            floor = $rtoi(number) - 1;
+[0;100;30m |[0m        else
+[0;100;30m |[0m            floor = number;
+[0;100;30m |[0m    endfunction
+[0;100;30m |[0m
+[0;41;30m-|[0m[0m[0;2m    function[0m[0;31m int[0m[0;2m max( input[0m[0;31m int[0m[0;2m a, b );[0m[0m
+[0;42;30m+|[0m[0m    function[0;32m integer[0m max( input[0;32m integer[0m a, b );[0m
+[0;100;30m |[0m        max = (a < b) ? b : a;
+[0;100;30m |[0m    endfunction
+[0;100;30m |[0m
+[0;41;30m-|[0m[0m[0;2m    function[0m[0;31m int[0m[0;2m min( input[0m[0;31m int[0m[0;2m a, b );[0m[0m
+[0;42;30m+|[0m[0m    function[0;32m integer[0m min( input[0;32m integer[0m a, b );[0m
+[0;100;30m |[0m        min = (a > b) ? b : a;
+[0;100;30m |[0m    endfunction
+[0;100;30m |[0m
+[0;100;30m |[0m`ifdef MAX_MEM
+[0;100;30m |[0m
+[0;100;30m |[0m    function integer open_bank_file( input integer bank );
+[0;100;30m |[0m        integer fd;
+[0;100;30m |[0m        reg [2048:1] filename;
+[0;100;30m |[0m        begin 
+[0;100;30m |[0m            $sformat( filename, "%0s/%m.%0d", tmp_model_dir, bank );
+[0;100;30m |[0m
+[0;100;30m |[0m            fd = $fopen(filename, "wb+");
+[0;100;30m |[0m            if (fd == 0)
+[0;100;30m |[0m            begin
+[0;100;30m |[0m                $display("%m: at time %0t ERROR: failed to open %0s.", $time, filename);
+[0;100;30m |[0m                $finish;
