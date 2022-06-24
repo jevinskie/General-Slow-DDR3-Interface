@@ -19,16 +19,17 @@ model: ddr3-sdram-verilog-model.zip
 	unzip -d model ddr3-sdram-verilog-model.zip
 	chmod -R +w model
 
+# FIXME: Patch STOP_ON_ERROR and DEBUG parameters
 model/ddr3.v: model
 
-tb-iverilog: slowDDR3.v tb.v model/ddr3.v
+tb-iverilog: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	cd model && \
 		iverilog -g2005-sv -o ../tb-iverilog ../tb.v ../slowDDR3.v ddr3.v -Dden2048Mb -Dx16
 
 test-iverilog-run: tb-iverilog
-	./test-iverilog
+	./tb-iverilog
 
-test-questa: slowDDR3.v tb.v model/ddr3.v
+test-questa: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	vlog slowDDR3.v
 	cd model && \
 		vlog -work ../work -sv +define+x16 +define+den2048Mb ddr3.v
