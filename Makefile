@@ -40,4 +40,4 @@ test-questa: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	vlog tb.v
 
 test-questa-run: test-questa
-	vsim -c tb -do "run -a"
+	vsim -c tb -do "runq -a"
