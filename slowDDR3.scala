@@ -97,8 +97,11 @@ case class DDR3Interface(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle {
   val dqs_n_oe: Bool = cfg.useTristate generate out(Bool())
   val dqs_n: UInt    = !cfg.useTristate generate inout(Analog(UInt(cfg.dqWidth / 8 bits)))
 
+  // Optional debug signals
   val init_state: InitState.C = cfg.enableDebug generate out(InitState())
   val work_state: WorkState.C = cfg.enableDebug generate out(WorkState())
+  val refresh_cnt: UInt       = cfg.enableDebug generate out(UInt(4 bits))
+  val refresh_issued: Bool    = cfg.enableDebug generate out(Bool())
 }
 
 case class DDR3TristateInterface(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle {
@@ -211,8 +214,10 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
   val refreshIssued = RegInit(False)
 
   if (cfg.enableDebug) {
-    phyIO.init_state := initState
-    phyIO.work_state := workState
+    phyIO.init_state     := initState
+    phyIO.work_state     := workState
+    phyIO.refresh_cnt    := refreshCount
+    phyIO.refresh_issued := refreshIssued
   }
 
   // ddr clock generator

@@ -23,10 +23,16 @@ model: ddr3-sdram-verilog-model.zip ddr3-model-iverilog-patch.patch
 model/ddr3.v: model
 
 tb-iverilog: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
-	iverilog -Dden2048Mb -Dx16 -g2005-sv -I model -o $@ tb.v slowDDR3.v model/ddr3.v
+	iverilog -s tb -Dden2048Mb -Dx16 -g2005-sv -I model -o $@ tb.v slowDDR3.v model/ddr3.v
 
 test-iverilog-run: tb-iverilog
 	./tb-iverilog
+
+tb-iverilog-trace: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh iverilog_dump.v
+	iverilog -s tb -s iverilog_dump -Dden2048Mb -Dx16 -g2005-sv -I model -o $@ tb.v slowDDR3.v model/ddr3.v iverilog_dump.v
+
+test-iverilog-trace-run: tb-iverilog-trace
+	./tb-iverilog-trace -fst
 
 test-questa: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	vlog slowDDR3.v

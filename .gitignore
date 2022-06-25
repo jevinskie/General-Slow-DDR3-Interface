@@ -11,6 +11,8 @@ ddr3-sdram-verilog-model.zip
 model/
 # iverilog
 tb-iverilog
+tb-iverilog-trace
+tb.fst
 # questa
 work/
 transcript
