@@ -353,7 +353,7 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
       phyIO.we          := False
       phyIO.bank        := sysIO.address(cfg.colWidth, 3 bits)
       phyIO.address(10) := True
-      phyIO.dm          := sysIO.sel
+      phyIO.dm          := ~sysIO.sel
       if (cfg.colWidth == 11) {
         phyIO.address(11)         := sysIO.address(10)
         phyIO.address(9 downto 0) := sysIO.address(9 downto 0)
