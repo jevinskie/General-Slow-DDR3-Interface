@@ -31,12 +31,14 @@ wire wr_rdy;
 reg wr_valid;
 wire [15:0] wr_payload;
 wire [26:0] address;
+wire [1:0] sel;
 wire init_fin;
 
 //counter
 reg [15:0] rdwr_cnt;
 
 assign address = {11'd0,rdwr_cnt};
+assign sel = 2'b11;
 assign wr_payload = rdwr_cnt;
 
 initial begin
@@ -134,6 +136,7 @@ slowDDR3 ddr_interface(
     .sysIO_dataWr_valid(wr_valid),
     .sysIO_dataWr_payload(wr_payload),
     .sysIO_address(address),
+    .sysIO_sel(sel),
     .sysIO_initFin(init_fin),
 
     .clk(clk),

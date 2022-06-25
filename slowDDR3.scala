@@ -114,6 +114,7 @@ case class DDR3SystemIO(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle with IM
   val dataRd: Stream[UInt] = Stream(UInt(cfg.dqWidth bits))
   val dataWr: Stream[UInt] = Stream(UInt(cfg.dqWidth bits))
   val address: UInt        = UInt(3 + cfg.rowWidth + cfg.colWidth bits)
+  val sel: UInt            = UInt(cfg.dqWidth / 8 bits)
   val initFin: Bool        = Bool()
 
   override def asMaster(): Unit = {
@@ -121,6 +122,7 @@ case class DDR3SystemIO(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle with IM
     slave(dataRd)
     in(initFin)
     out(address)
+    out(sel)
   }
 
   override def asSlave(): Unit = {
@@ -128,6 +130,7 @@ case class DDR3SystemIO(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Bundle with IM
     master(dataRd)
     out(initFin)
     in(address)
+    in(sel)
   }
 }
 
@@ -172,7 +175,6 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
   // const value
   phyIO.cs  := False
   phyIO.odt := False
-  phyIO.dm  := 0
 
   // init value
   phyIO.address.setAsReg() init UInt(cfg.rowWidth bits).setAll()
@@ -184,6 +186,7 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
   phyIO.clk_n.setAsReg() init True
   phyIO.cke.setAsReg() init False
   phyIO.rst_n.setAsReg() init False
+  phyIO.dm.setAsReg() init 0
 
   // dq and dqs is tri-state
   val dqWire   = UInt(cfg.dqWidth bits)
@@ -350,6 +353,7 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
       phyIO.we          := False
       phyIO.bank        := sysIO.address(cfg.colWidth, 3 bits)
       phyIO.address(10) := True
+      phyIO.dm          := sysIO.sel
       if (cfg.colWidth == 11) {
         phyIO.address(11)         := sysIO.address(10)
         phyIO.address(9 downto 0) := sysIO.address(9 downto 0)
