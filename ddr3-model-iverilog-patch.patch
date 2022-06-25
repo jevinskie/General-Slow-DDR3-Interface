@@ -95,15 +95,51 @@ index 0217758..c50d20f 100644
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff --git a/model_orig/ddr3.v b/model/ddr3.v
-index 0b1970c..5f5b0ca 100644
+index 0b1970c..03da1a9 100644
 --- a/model_orig/ddr3.v
 +++ b/model/ddr3.v
-@@ -1635,7 +1635,7 @@ module ddr3 (
-                             init_step = init_step + 1;
-                         end
-                         1 : begin 
--                           if (dll_en) init_step = init_step + 1;
-+                           init_step = init_step + 1;
-                         end
-                         2 : begin
-                             if (&init_mode_reg && init_dll_reset && zq_set) begin
+@@ -1421,7 +1421,7 @@ module ddr3 (
+                         if (mpr_en) begin
+                             $display ("%m: at time %t ERROR: %s Failure.  Multipurpose Register must be disabled.", $time, cmd_string[cmd]);
+                             if (STOP_ON_ERROR) $stop(0);
+-                        end else if (!init_done) begin
++                        end else if (!init_done & dll_en) begin
+                             $display ("%m: at time %t ERROR: %s Failure.  Initialization sequence is not complete.", $time, cmd_string[cmd]);
+                             if (STOP_ON_ERROR) $stop(0);
+                         end else if (active_bank[bank]) begin
+@@ -1460,7 +1460,7 @@ module ddr3 (
+                         if (mpr_en) begin
+                             $display ("%m: at time %t ERROR: %s Failure.  Multipurpose Register must be disabled.", $time, cmd_string[cmd]);
+                             if (STOP_ON_ERROR) $stop(0);
+-                        end else if (!init_done) begin
++                        end else if (!init_done & dll_en) begin
+                             $display ("%m: at time %t ERROR: %s Failure.  Initialization sequence is not complete.", $time, cmd_string[cmd]);
+                             if (STOP_ON_ERROR) $stop(0);
+                         end else if (!active_bank[bank])  begin
+@@ -1520,7 +1520,7 @@ module ddr3 (
+                         if (mpr_en && (addr[1:0] != 2'b00)) begin
+                             $display ("%m: at time %t ERROR: %s Failure.  addr[1:0] must be zero during Multipurpose Register Read.", $time, cmd_string[cmd]);
+                             if (STOP_ON_ERROR) $stop(0);
+-                        end else if (!init_done) begin
++                        end else if (!init_done & dll_en) begin
+                             $display ("%m: at time %t ERROR: %s Failure.  Initialization sequence is not complete.", $time, cmd_string[cmd]);
+                             if (STOP_ON_ERROR) $stop(0);
+                         end else if (!active_bank[bank] && !mpr_en) begin
+@@ -1667,7 +1667,7 @@ module ddr3 (
+                         end else if (odt_state) begin
+                             $display ("%m: at time %t ERROR: Self Refresh Failure.  ODT must be off prior to entering Self Refresh", $time);
+                             if (STOP_ON_ERROR) $stop(0);
+-                        end else if (!init_done) begin
++                        end else if (!init_done & dll_en) begin
+                             $display ("%m: at time %t ERROR: Self Refresh Failure.  Initialization sequence is not complete.", $time);
+                             if (STOP_ON_ERROR) $stop(0);
+                         end else begin
+@@ -1701,7 +1701,7 @@ module ddr3 (
+                         if (mpr_en) begin
+                             $display ("%m: at time %t ERROR: Power Down Failure.  Multipurpose Register must be disabled.", $time);
+                             if (STOP_ON_ERROR) $stop(0);
+-                        end else if (!init_done) begin
++                        end else if (!init_done & dll_en) begin
+                             $display ("%m: at time %t ERROR: Power Down Failure.  Initialization sequence is not complete.", $time);
+                             if (STOP_ON_ERROR) $stop(0);
+                         end else begin
