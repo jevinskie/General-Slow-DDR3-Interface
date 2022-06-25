@@ -86,7 +86,7 @@ always@(posedge clk)begin
 end
 
 always begin
-    #5 clk=~clk; //5ns period, sys clk is 100MHz
+    #10 clk=~clk; //5ns period, sys clk is 100MHz
 end
 
 ddr3 ddr_module(

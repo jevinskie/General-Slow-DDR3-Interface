@@ -12,7 +12,7 @@ slowDDR3.v: slowDDR3.scala
 	sbt run
 
 ddr3-sdram-verilog-model.zip:
-	wget https://media-www.micron.com/-/media/client/global/documents/products/sim-model/dram/ddr3/ddr3-sdram-verilog-model.zip
+	wget -N https://media-www.micron.com/-/media/client/global/documents/products/sim-model/dram/ddr3/ddr3-sdram-verilog-model.zip
 
 model: ddr3-sdram-verilog-model.zip ddr3-model-iverilog-patch.patch
 	rm -rf model
@@ -29,14 +29,14 @@ test-iverilog-run: tb-iverilog
 	./tb-iverilog
 
 tb-iverilog-trace: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh iverilog_dump.v
-	iverilog -s tb -s iverilog_dump -Dden2048Mb -Dx16 -g2005-sv -I model -o $@ tb.v slowDDR3.v model/ddr3.v iverilog_dump.v
+	iverilog -s tb -s iverilog_dump -Dsg25 -Dden2048Mb -Dx16 -g2005-sv -I model -o $@ tb.v slowDDR3.v model/ddr3.v iverilog_dump.v
 
 test-iverilog-trace-run: tb-iverilog-trace
 	./tb-iverilog-trace -fst
 
 test-questa: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	vlog slowDDR3.v
-	vlog -sv +define+x16 +define+den2048Mb +incdir+model model/ddr3.v
+	vlog -sv +define+sg25 +define+x16 +define+den2048Mb +incdir+model model/ddr3.v
 	vlog tb.v
 
 test-questa-run: test-questa

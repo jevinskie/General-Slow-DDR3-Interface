@@ -103,3 +103,16 @@ index 0217758..c50d20f 100644
      parameter BUS_DELAY        =       0; // delay in nanoseconds
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
+diff --git a/model_orig/ddr3.v b/model/ddr3.v
+index 0b1970c..5f5b0ca 100644
+--- a/model_orig/ddr3.v
++++ b/model/ddr3.v
+@@ -1635,7 +1635,7 @@ module ddr3 (
+                             init_step = init_step + 1;
+                         end
+                         1 : begin 
+-                           if (dll_en) init_step = init_step + 1;
++                           init_step = init_step + 1;
+                         end
+                         2 : begin
+                             if (&init_mode_reg && init_dll_reset && zq_set) begin
