@@ -5,6 +5,6 @@ proc runq args {
    suppress 8630;
    when -label enable_div0_warn \
       { $now > 0 } \
-      { echo "Re-enabled divsion by 0 warnings"; suppress -clear 8630; };
+      { echo "Re-enabled divsion by 0 warnings"; suppress -clear 8630; nowhen enable_div0_warn; };
    run $args;
 }
