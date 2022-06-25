@@ -1,7 +1,16 @@
 diff --git a/model_orig/1024Mb_ddr3_parameters.vh b/model/1024Mb_ddr3_parameters.vh
-index f44bab6..1ce07ff 100755
+index f44bab6..e70df31 100755
 --- a/model_orig/1024Mb_ddr3_parameters.vh
 +++ b/model/1024Mb_ddr3_parameters.vh
+@@ -469,7 +469,7 @@
+     parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
+ 
+     // Clock
+-    parameter TCK_MAX          =    3300; // tCK        ps    Maximum Clock Cycle Time
++    parameter TCK_MAX          =   40000; // tCK        ps    Maximum Clock Cycle Time
+     parameter TCH_AVG_MIN      =    0.47; // tCH        tCK   Minimum Clock High-Level Pulse Width
+     parameter TCL_AVG_MIN      =    0.47; // tCL        tCK   Minimum Clock Low-Level Pulse Width
+     parameter TCH_AVG_MAX      =    0.53; // tCH        tCK   Maximum Clock High-Level Pulse Width
 @@ -594,8 +594,8 @@
      // Simulation parameters
      parameter RZQ              =     240; // termination resistance
@@ -14,9 +23,27 @@ index f44bab6..1ce07ff 100755
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff --git a/model_orig/2048Mb_ddr3_parameters.vh b/model/2048Mb_ddr3_parameters.vh
-index 650c84a..e3f1ae1 100755
+index 650c84a..ec4c6d6 100755
 --- a/model_orig/2048Mb_ddr3_parameters.vh
 +++ b/model/2048Mb_ddr3_parameters.vh
+@@ -351,7 +351,7 @@
+     parameter CL_TIME          =   12500; // CL         ps    Minimum CAS Latency
+ `else
+     `define sg25                          // sg25 is equivalent to the JEDEC DDR3-800E (6-6-6) speed bin
+-    parameter TCK_MIN          =    2500; // tCK        ps    Minimum Clock Cycle Time
++    parameter TCK_MIN          =   40000; // tCK        ps    Minimum Clock Cycle Time
+     parameter TJIT_PER         =     100; // tJIT(per)  ps    Period JItter
+     parameter TJIT_CC          =     200; // tJIT(cc)   ps    Cycle to Cycle jitter
+     parameter TERR_2PER        =     147; // tERR(2per) ps    Accumulated Error (2-cycle)
+@@ -457,7 +457,7 @@
+     parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
+ 
+     // Clock
+-    parameter TCK_MAX          =    3300; // tCK        ps    Maximum Clock Cycle Time
++    parameter TCK_MAX          =   40000; // tCK        ps    Maximum Clock Cycle Time
+     parameter TCH_AVG_MIN      =    0.47; // tCH        tCK   Minimum Clock High-Level Pulse Width
+     parameter TCL_AVG_MIN      =    0.47; // tCL        tCK   Minimum Clock Low-Level Pulse Width
+     parameter TCH_AVG_MAX      =    0.53; // tCH        tCK   Maximum Clock High-Level Pulse Width
 @@ -582,8 +582,8 @@
      // Simulation parameters
      parameter RZQ              =     240; // termination resistance
@@ -29,9 +56,18 @@ index 650c84a..e3f1ae1 100755
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff --git a/model_orig/4096Mb_ddr3_parameters.vh b/model/4096Mb_ddr3_parameters.vh
-index 30caa69..8753cab 100755
+index 30caa69..37d5012 100755
 --- a/model_orig/4096Mb_ddr3_parameters.vh
 +++ b/model/4096Mb_ddr3_parameters.vh
+@@ -457,7 +457,7 @@
+     parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
+ 
+     // Clock
+-    parameter TCK_MAX          =    3300; // tCK        ps    Maximum Clock Cycle Time
++    parameter TCK_MAX          =   40000; // tCK        ps    Maximum Clock Cycle Time
+     parameter TCH_AVG_MIN      =    0.47; // tCH        tCK   Minimum Clock High-Level Pulse Width
+     parameter TCL_AVG_MIN      =    0.47; // tCL        tCK   Minimum Clock Low-Level Pulse Width
+     parameter TCH_AVG_MAX      =    0.53; // tCH        tCK   Maximum Clock High-Level Pulse Width
 @@ -582,8 +582,8 @@
      // Simulation parameters
      parameter RZQ              =     240; // termination resistance
@@ -44,9 +80,18 @@ index 30caa69..8753cab 100755
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff --git a/model_orig/8192Mb_ddr3_parameters.vh b/model/8192Mb_ddr3_parameters.vh
-index 0217758..4f653d7 100644
+index 0217758..c50d20f 100644
 --- a/model_orig/8192Mb_ddr3_parameters.vh
 +++ b/model/8192Mb_ddr3_parameters.vh
+@@ -297,7 +297,7 @@
+     parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
+ 
+     // Clock
+-    parameter TCK_MAX          =    3300; // tCK        ps    Maximum Clock Cycle Time
++    parameter TCK_MAX          =   40000; // tCK        ps    Maximum Clock Cycle Time
+     parameter TCH_AVG_MIN      =    0.47; // tCH        tCK   Minimum Clock High-Level Pulse Width
+     parameter TCL_AVG_MIN      =    0.47; // tCL        tCK   Minimum Clock Low-Level Pulse Width
+     parameter TCH_AVG_MAX      =    0.53; // tCH        tCK   Maximum Clock High-Level Pulse Width
 @@ -423,8 +423,8 @@
      // Simulation parameters
      parameter RZQ              =     240; // termination resistance
