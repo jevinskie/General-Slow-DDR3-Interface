@@ -35,10 +35,10 @@ wire [1:0] sel;
 wire init_fin;
 
 //counter
-reg [15:0] rdwr_cnt;
+reg [16:0] rdwr_cnt;
 
-assign address = {11'd0,rdwr_cnt};
-assign sel = 2'b11;
+assign address = {10'd0,rdwr_cnt};
+assign sel = 2'b00;
 assign wr_payload = rdwr_cnt;
 
 initial begin
@@ -57,15 +57,15 @@ initial begin
     @(init_fin)
     wr_valid=1;
 
-    //write 32768*16bits
-    @(rdwr_cnt==32768)
+    //write 66560*16bits (65 KB to wrap DQ width)
+    @(rdwr_cnt==66560)
     wr_valid=0;
     rdwr_cnt=0;
 
     rd_rdy=1;
 
-    //read 32768*16bits
-    @(rdwr_cnt==32768)
+    //read 66560*16bits
+    @(rdwr_cnt==66560)
     rd_rdy=0;
 
     $display("\n\n----------Test Passed----------\n");
@@ -78,7 +78,7 @@ always@(posedge clk)begin
     if(wr_rdy || rd_valid)
         rdwr_cnt<=rdwr_cnt+1;
 
-    if(rd_valid && rdwr_cnt!=rd_payload)begin
+    if(rd_valid && (rdwr_cnt & 16'hffff) !=rd_payload)begin
         $display("\n----------Read Data Error----------");
         $display("The read payload is %d, it shoube be %d\n",rd_payload,rdwr_cnt);
         $finish();
