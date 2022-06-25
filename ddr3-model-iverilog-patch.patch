@@ -95,9 +95,18 @@ index 0217758..c50d20f 100644
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff --git a/model_orig/ddr3.v b/model/ddr3.v
-index 0b1970c..03da1a9 100644
+index 0b1970c..b70b10f 100644
 --- a/model_orig/ddr3.v
 +++ b/model/ddr3.v
+@@ -539,7 +539,7 @@ module ddr3 (
+     bufif1 buf_dq     [DQ_BITS-1:0]  (dq,      dq_out_dly,   dq_out_en_dly  & {DQ_BITS {out_en}});
+     assign tdqs_n = {DQS_BITS{1'bz}};
+ 
+-    assign TZQCS   = max( 64, ceil( 80000/tck_avg));
++    assign TZQCS   =  max( 64, ceil( 80000/tck_avg));
+     assign TZQINIT =  max(512, ceil(640000/tck_avg));
+     assign TZQOPER =  max(256, ceil(320000/tck_avg));
+ 
 @@ -1421,7 +1421,7 @@ module ddr3 (
                          if (mpr_en) begin
                              $display ("%m: at time %t ERROR: %s Failure.  Multipurpose Register must be disabled.", $time, cmd_string[cmd]);
