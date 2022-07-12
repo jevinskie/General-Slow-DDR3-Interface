@@ -22,6 +22,7 @@ wire [1:0] dm;
 wire [15:0] dq;
 wire [1:0] dqs_p;
 wire [1:0] dqs_n;
+wire [1:0] tdqs_n; // prevent warning
 
 //user interface
 wire rd_valid;
@@ -105,6 +106,7 @@ ddr3 ddr_module(
     .dq(dq),
     .dqs(dqs_p),
     .dqs_n(dqs_n),
+    .tdqs_n(tdqs_n),
     .odt(odt)
 );
 
