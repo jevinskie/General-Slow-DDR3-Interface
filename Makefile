@@ -38,7 +38,7 @@ test-questa: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	vlog slowDDR3.v
 	vlog -sv +define+sg25 +define+x16 +define+den2048Mb +incdir+model model/ddr3.v
 	vlog tb.v
-	vopt +noacc tb -o tb_opt
+	vopt -noincr +noacc tb -o tb_opt
 
 test-questa-run: test-questa
 	vsim -c tb_opt -do "runq -a"
