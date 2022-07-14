@@ -603,6 +603,7 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
 
 case class CLIOptions(
     odir: String = ".",
+    filename: String = "slowDDR3.v",
     sysClk: Int = (100 * Hz.MHz).toInt,
     tristate: Boolean = false,
     debug: Boolean = false
@@ -618,6 +619,7 @@ object DDR3Generate extends CaseApp[CLIOptions] {
     )
     SpinalConfig(
       targetDirectory = options.odir,
+      netlistFileName = options.filename,
       defaultConfigForClockDomains = ClockDomainConfig(
         resetKind = ASYNC,
         resetActiveLevel = LOW
