@@ -28,8 +28,8 @@ model: model-unpatched ddr3-model-patch.patch
 
 model/ddr3.v: model
 
-generate-model-patch:
-	diff -u model-unpatched model > ddr3-model-patch.patch || exit 0
+generate-model-patch: model-unpatched model
+	diff -u model-unpatched model | perl -pe "s/(^(---|\+\+\+)\s+\S+).*/\1/" > ddr3-model-patch.patch
 
 tb-iverilog: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	iverilog -s tb -Dden2048Mb -Dx16 -g2005-sv -I model -o $@ tb.v slowDDR3.v model/ddr3.v

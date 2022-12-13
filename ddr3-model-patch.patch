@@ -1,6 +1,6 @@
 diff -u model-unpatched/1024Mb_ddr3_parameters.vh model/1024Mb_ddr3_parameters.vh
---- model-unpatched/1024Mb_ddr3_parameters.vh	2015-08-20 12:14:11
-+++ model/1024Mb_ddr3_parameters.vh	2022-12-13 12:52:42
+--- model-unpatched/1024Mb_ddr3_parameters.vh
++++ model/1024Mb_ddr3_parameters.vh
 @@ -469,7 +469,7 @@
      parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
  
@@ -22,8 +22,8 @@ diff -u model-unpatched/1024Mb_ddr3_parameters.vh model/1024Mb_ddr3_parameters.v
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff -u model-unpatched/2048Mb_ddr3_parameters.vh model/2048Mb_ddr3_parameters.vh
---- model-unpatched/2048Mb_ddr3_parameters.vh	2015-08-20 12:14:11
-+++ model/2048Mb_ddr3_parameters.vh	2022-12-13 12:52:42
+--- model-unpatched/2048Mb_ddr3_parameters.vh
++++ model/2048Mb_ddr3_parameters.vh
 @@ -457,7 +457,7 @@
      parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
  
@@ -45,8 +45,8 @@ diff -u model-unpatched/2048Mb_ddr3_parameters.vh model/2048Mb_ddr3_parameters.v
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff -u model-unpatched/4096Mb_ddr3_parameters.vh model/4096Mb_ddr3_parameters.vh
---- model-unpatched/4096Mb_ddr3_parameters.vh	2015-08-20 12:14:11
-+++ model/4096Mb_ddr3_parameters.vh	2022-12-13 12:52:42
+--- model-unpatched/4096Mb_ddr3_parameters.vh
++++ model/4096Mb_ddr3_parameters.vh
 @@ -457,7 +457,7 @@
      parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
  
@@ -68,8 +68,8 @@ diff -u model-unpatched/4096Mb_ddr3_parameters.vh model/4096Mb_ddr3_parameters.v
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff -u model-unpatched/8192Mb_ddr3_parameters.vh model/8192Mb_ddr3_parameters.vh
---- model-unpatched/8192Mb_ddr3_parameters.vh	2015-08-20 12:14:11
-+++ model/8192Mb_ddr3_parameters.vh	2022-12-13 12:52:42
+--- model-unpatched/8192Mb_ddr3_parameters.vh
++++ model/8192Mb_ddr3_parameters.vh
 @@ -297,7 +297,7 @@
      parameter CWL_MAX          =      10; // CWL        tCK   Maximum CAS Write Latency
  
@@ -91,8 +91,8 @@ diff -u model-unpatched/8192Mb_ddr3_parameters.vh model/8192Mb_ddr3_parameters.v
      parameter RANDOM_OUT_DELAY =       0; // If set to 1, the model will put a random amount of delay on DQ/DQS during reads
      parameter RANDOM_SEED      =   31913; //seed value for random generator.
 diff -u model-unpatched/ddr3.v model/ddr3.v
---- model-unpatched/ddr3.v	2015-09-09 18:26:53
-+++ model/ddr3.v	2022-12-13 12:52:48
+--- model-unpatched/ddr3.v
++++ model/ddr3.v
 @@ -1421,7 +1421,7 @@
                          if (mpr_en) begin
                              $display ("%m: at time %t ERROR: %s Failure.  Multipurpose Register must be disabled.", $time, cmd_string[cmd]);
