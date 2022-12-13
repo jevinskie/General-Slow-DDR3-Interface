@@ -8,6 +8,7 @@ target/
 
 # testing
 ddr3-sdram-verilog-model.zip
+model-unpatched/
 model/
 # iverilog
 tb-iverilog
