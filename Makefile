@@ -1,10 +1,12 @@
 all: slowDDR3.v
 
-.PHONY: clean test-questa
+.PHONY: clean generate-model-patch \
+	test-iverilog-run test-iverilog-trace-run \
+	test-questa test-questa-run
 
 clean:
 	rm -rf slowDDR3.v \
-		ddr3-sdram-verilog-model.zip model \
+		ddr3-sdram-verilog-model.zip model-unpatched model \
 		tb-iverilog \
 		transcript work
 
@@ -14,13 +16,20 @@ slowDDR3.v: slowDDR3.scala
 ddr3-sdram-verilog-model.zip:
 	wget -N https://media-www.micron.com/-/media/client/global/documents/products/sim-model/dram/ddr3/ddr3-sdram-verilog-model.zip
 
-model: ddr3-sdram-verilog-model.zip ddr3-model-iverilog-patch.patch
-	rm -rf model
-	unzip -d model ddr3-sdram-verilog-model.zip
-	chmod -R +w model
-	patch -p1 < ddr3-model-iverilog-patch.patch
+model-unpatched: ddr3-sdram-verilog-model.zip
+	rm -rf $@
+	unzip -d $@ ddr3-sdram-verilog-model.zip
+	chmod -R +w $@
+
+model: model-unpatched ddr3-model-patch.patch
+	rm -rf $@
+	cp -R model-unpatched $@
+	patch -p0 < ddr3-model-patch.patch
 
 model/ddr3.v: model
+
+generate-model-patch:
+	diff -u model-unpatched model > ddr3-model-patch.patch || exit 0
 
 tb-iverilog: slowDDR3.v tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
 	iverilog -s tb -Dden2048Mb -Dx16 -g2005-sv -I model -o $@ tb.v slowDDR3.v model/ddr3.v
