@@ -1,4 +1,4 @@
-val spinalVersion = "1.7.1"
+val spinalVersion = "1.8.0b"
 val spinalCore    = "com.github.spinalhdl" %% "spinalhdl-core" % spinalVersion
 val spinalLib     = "com.github.spinalhdl" %% "spinalhdl-lib"  % spinalVersion
 val spinalIdslPlugin = compilerPlugin(
@@ -11,7 +11,8 @@ lazy val mylib = (project in file("."))
     libraryDependencies ++= Seq(spinalCore, spinalLib, spinalIdslPlugin)
   )
 
-resolvers += Resolver.sonatypeRepo("releases")
-libraryDependencies += "com.github.alexarchambault" %% "case-app" % "2.1.0-M14"
+resolvers ++= Resolver.sonatypeOssRepos("snapshots")
+libraryDependencies += "com.github.alexarchambault" %% "case-app" % "2.1.0-M21"
 
-fork := true
+fork          := true
+scalacOptions := Seq("-deprecation")

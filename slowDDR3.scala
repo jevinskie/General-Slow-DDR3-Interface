@@ -225,7 +225,7 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
 
   // ddr clock generator
   val clkGen = new Area {
-    val clk = Reg(Bool) init False
+    val clk = Reg(Bool()) init False
 
     clk := ~clk
 
@@ -250,7 +250,7 @@ class slowDDR3(cfg: slowDDR3Cfg = slowDDR3Cfg()) extends Component {
   val dqsOut = RegInit(False)
   val dqIn   = RegInit(False)
   val IOArea = new Area {
-    val clk = Reg(Bool) init False
+    val clk = Reg(Bool()) init False
     val cnt = RegInit(U"00000")
 
     when(dqsOut === False) {
