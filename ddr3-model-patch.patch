@@ -113,10 +113,10 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
 -    always @(cke    ) 
 -      cke_in     <= #BUS_DELAY cke;
 +    if (BUS_DELAY) begin
-+        always @(cke    ) 
++        always @(cke    )
 +          cke_in     <= #BUS_DELAY cke;
 +    end else begin
-+        always @(cke    ) 
++        always @(cke    )
 +          cke_in     <= cke;
 +    end
  
