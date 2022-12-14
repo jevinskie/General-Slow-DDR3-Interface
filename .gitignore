@@ -17,3 +17,5 @@ tb.fst
 # questa
 work/
 transcript
+# verilator
+obj_dir/

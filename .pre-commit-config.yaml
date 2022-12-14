@@ -3,3 +3,8 @@ repos:
   rev: 1.0.1
   hooks:
   - id: scalafmt
+- repo: https://github.com/pre-commit/mirrors-clang-format
+  rev: v15.0.4
+  hooks:
+  - id: clang-format
+    types_or: [c++]
