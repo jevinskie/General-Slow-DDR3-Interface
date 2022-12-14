@@ -57,7 +57,7 @@ test-questa-run: test-questa
 	vsim -c tb_opt -do "runq -a"
 
 obj_dir/VslowDDR3_tb: slowDDR3.v slowDDR3_tb.v model/ddr3.v model/2048Mb_ddr3_parameters.vh
-	verilator --timing --exe tb-verilator.cpp --cc slowDDR3_tb.v --cc slowDDR3.v --cc model/ddr3.v +define+sg25 +define+x16 +define+den2048Mb +incdir+model -Wno-WIDTH -Wno-MULTIDRIVEN -Wno-CASEX -Wno-CASEINCOMPLETE -Wno-UNSIGNED -Wno-REALCVT
+	verilator --timing --exe tb-verilator.cpp --cc slowDDR3_tb.v --cc slowDDR3.v --cc model/ddr3.v +define+sg25 +define+x16 +define+den2048Mb +incdir+model -Wno-WIDTH -Wno-MULTIDRIVEN -Wno-CASEX -Wno-CASEINCOMPLETE -Wno-UNSIGNED -Wno-REALCVT -Wno-ZERODLY
 	CXXFLAGS="-Wno-unknown-warning-option" make -j $(VERILATOR_JOBS) -C obj_dir -f VslowDDR3_tb.mk VslowDDR3_tb
 
 test-verilator-run: obj_dir/VslowDDR3_tb
