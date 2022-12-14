@@ -93,70 +93,7 @@ diff -u model-unpatched/8192Mb_ddr3_parameters.vh model/8192Mb_ddr3_parameters.v
 diff -u model-unpatched/ddr3.v model/ddr3.v
 --- model-unpatched/ddr3.v
 +++ model/ddr3.v
-@@ -490,23 +490,47 @@
-     reg     [63:0] prev_dqs_in;
-     reg            diff_ck;
- 
--    always @(rst_n  ) rst_n_in   <= #BUS_DELAY rst_n;
--    always @(ck     ) ck_in      <= #BUS_DELAY ck;
--    always @(ck_n   ) ck_n_in    <= #BUS_DELAY ck_n;
-+    if (BUS_DELAY) begin
-+        always @(rst_n  ) rst_n_in   <= #BUS_DELAY rst_n;
-+        always @(ck     ) ck_in      <= #BUS_DELAY ck;
-+        always @(ck_n   ) ck_n_in    <= #BUS_DELAY ck_n;
-+    end else begin
-+        always @(rst_n  ) rst_n_in   <= rst_n;
-+        always @(ck     ) ck_in      <= ck;
-+        always @(ck_n   ) ck_n_in    <= ck_n;
-+    end
- 
--    always @(cke    ) 
--      cke_in     <= #BUS_DELAY cke;
-+    if (BUS_DELAY) begin
-+        always @(cke    )
-+          cke_in     <= #BUS_DELAY cke;
-+    end else begin
-+        always @(cke    )
-+          cke_in     <= cke;
-+    end
- 
--    always @(cs_n   ) cs_n_in    <= #BUS_DELAY cs_n;
--    always @(ras_n  ) ras_n_in   <= #BUS_DELAY ras_n;
--    always @(cas_n  ) cas_n_in   <= #BUS_DELAY cas_n;
--    always @(we_n   ) we_n_in    <= #BUS_DELAY we_n;
--    always @(dm_tdqs) dm_in      <= #BUS_DELAY dm_tdqs;
--    always @(ba     ) ba_in      <= #BUS_DELAY ba;
--    always @(addr   ) addr_in    <= #BUS_DELAY addr;
--    always @(dq     ) dq_in      <= #BUS_DELAY dq;
--    always @(dqs or dqs_n) dqs_in <= #BUS_DELAY (dqs_n<<32) | dqs;
--    always @(odt    ) if (!feature_odt_hi) odt_in     <= #BUS_DELAY odt;
-+    if (BUS_DELAY) begin
-+        always @(cs_n   ) cs_n_in    <= #BUS_DELAY cs_n;
-+        always @(ras_n  ) ras_n_in   <= #BUS_DELAY ras_n;
-+        always @(cas_n  ) cas_n_in   <= #BUS_DELAY cas_n;
-+        always @(we_n   ) we_n_in    <= #BUS_DELAY we_n;
-+        always @(dm_tdqs) dm_in      <= #BUS_DELAY dm_tdqs;
-+        always @(ba     ) ba_in      <= #BUS_DELAY ba;
-+        always @(addr   ) addr_in    <= #BUS_DELAY addr;
-+        always @(dq     ) dq_in      <= #BUS_DELAY dq;
-+        always @(dqs or dqs_n) dqs_in <= #BUS_DELAY (dqs_n<<32) | dqs;
-+        always @(odt    ) if (!feature_odt_hi) odt_in     <= #BUS_DELAY odt;
-+    end else begin
-+        always @(cs_n   ) cs_n_in    <= cs_n;
-+        always @(ras_n  ) ras_n_in   <= ras_n;
-+        always @(cas_n  ) cas_n_in   <= cas_n;
-+        always @(we_n   ) we_n_in    <= we_n;
-+        always @(dm_tdqs) dm_in      <= dm_tdqs;
-+        always @(ba     ) ba_in      <= ba;
-+        always @(addr   ) addr_in    <= addr;
-+        always @(dq     ) dq_in      <= dq;
-+        always @(dqs or dqs_n) dqs_in <= (dqs_n<<32) | dqs;
-+        always @(odt    ) if (!feature_odt_hi) odt_in     <= odt;
-+    end
-     // create internal clock
-     always @(posedge ck_in) diff_ck <= ck_in;
-     always @(posedge ck_n_in) diff_ck <= ~ck_n_in;
-@@ -651,7 +675,11 @@
+@@ -651,7 +651,11 @@
      );
          integer code;
          integer offset;
@@ -168,7 +105,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
          reg [RFF_BITS:1] read_value;
      
          begin
-@@ -1394,9 +1422,9 @@
+@@ -1394,9 +1398,9 @@
                                              end else begin
                                                  if (DEBUG) $display ("%m: at time %t INFO: %s bank %d", $time, cmd_string[cmd], i);
                                                  active_bank[i] = 1'b0;
@@ -181,7 +118,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
                                              end
                                          end
                                      end
-@@ -1421,7 +1449,7 @@
+@@ -1421,7 +1425,7 @@
                          if (mpr_en) begin
                              $display ("%m: at time %t ERROR: %s Failure.  Multipurpose Register must be disabled.", $time, cmd_string[cmd]);
                              if (STOP_ON_ERROR) $stop(0);
@@ -190,7 +127,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
                              $display ("%m: at time %t ERROR: %s Failure.  Initialization sequence is not complete.", $time, cmd_string[cmd]);
                              if (STOP_ON_ERROR) $stop(0);
                          end else if (active_bank[bank]) begin
-@@ -1460,7 +1488,7 @@
+@@ -1460,7 +1464,7 @@
                          if (mpr_en) begin
                              $display ("%m: at time %t ERROR: %s Failure.  Multipurpose Register must be disabled.", $time, cmd_string[cmd]);
                              if (STOP_ON_ERROR) $stop(0);
@@ -199,7 +136,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
                              $display ("%m: at time %t ERROR: %s Failure.  Initialization sequence is not complete.", $time, cmd_string[cmd]);
                              if (STOP_ON_ERROR) $stop(0);
                          end else if (!active_bank[bank])  begin
-@@ -1520,7 +1548,7 @@
+@@ -1520,7 +1524,7 @@
                          if (mpr_en && (addr[1:0] != 2'b00)) begin
                              $display ("%m: at time %t ERROR: %s Failure.  addr[1:0] must be zero during Multipurpose Register Read.", $time, cmd_string[cmd]);
                              if (STOP_ON_ERROR) $stop(0);
@@ -208,7 +145,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
                              $display ("%m: at time %t ERROR: %s Failure.  Initialization sequence is not complete.", $time, cmd_string[cmd]);
                              if (STOP_ON_ERROR) $stop(0);
                          end else if (!active_bank[bank] && !mpr_en) begin
-@@ -1667,7 +1695,7 @@
+@@ -1667,7 +1671,7 @@
                          end else if (odt_state) begin
                              $display ("%m: at time %t ERROR: Self Refresh Failure.  ODT must be off prior to entering Self Refresh", $time);
                              if (STOP_ON_ERROR) $stop(0);
@@ -217,7 +154,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
                              $display ("%m: at time %t ERROR: Self Refresh Failure.  Initialization sequence is not complete.", $time);
                              if (STOP_ON_ERROR) $stop(0);
                          end else begin
-@@ -1701,7 +1729,7 @@
+@@ -1701,7 +1705,7 @@
                          if (mpr_en) begin
                              $display ("%m: at time %t ERROR: Power Down Failure.  Multipurpose Register must be disabled.", $time);
                              if (STOP_ON_ERROR) $stop(0);
@@ -226,7 +163,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
                              $display ("%m: at time %t ERROR: Power Down Failure.  Initialization sequence is not complete.", $time);
                              if (STOP_ON_ERROR) $stop(0);
                          end else begin
-@@ -2118,10 +2146,10 @@
+@@ -2118,10 +2122,10 @@
                                  // the internal precharge happens (not at the next rising clock edge after this event).
                                  if ($time - tm_bank_read_end[i] < TRTP) begin
                                      if (DEBUG) $display ("%m: at time %t INFO: Auto Precharge bank %d", tm_bank_read_end[i] + TRTP, i);
@@ -241,7 +178,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
                                      ck_precharge = ck_cntr;
                                  end else begin
                                      if (DEBUG) $display ("%m: at time %t INFO: Auto Precharge bank %d", $time, i);
-@@ -2470,7 +2498,7 @@
+@@ -2470,7 +2474,7 @@
      end
  
      task cmd_addr_timing_check;
@@ -250,7 +187,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
      reg [4:0] i;
      begin
          if (rst_n_in && prev_cke) begin
-@@ -2514,7 +2542,7 @@
+@@ -2514,7 +2518,7 @@
  
      // Processes to check setup and hold of data signals
      task dm_timing_check;
@@ -259,7 +196,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
      reg [4:0] i;
      begin
          if (dqs_in_valid) begin
-@@ -2565,7 +2593,7 @@
+@@ -2565,7 +2569,7 @@
      always @(dm_in[31]) dm_timing_check(31);
  
      task dq_timing_check;
@@ -268,7 +205,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
      reg [6:0] i;
      begin
          if (dqs_in_valid) begin
-@@ -2712,7 +2740,7 @@
+@@ -2712,7 +2716,7 @@
      always @(dq_in[127]) dq_timing_check(127);
     
      task dqs_pos_timing_check;
@@ -277,7 +214,7 @@ diff -u model-unpatched/ddr3.v model/ddr3.v
      reg [5:0] i;
      reg [4:0] j;
      begin
-@@ -2847,7 +2875,7 @@
+@@ -2847,7 +2851,7 @@
      always @(negedge dqs_in[63]) if (!dqs_in[63]) dqs_pos_timing_check(63);
     
      task dqs_neg_timing_check;
